@@ -64,9 +64,14 @@ def main():
             else:
                 default_choice = 0
             os.system("")  # 解决cmd的ANSI转义bug
-            translator = BulletMenu(
-                f"请为『{project_dir.split(os.sep)[-1]}』项目选择翻译器：", TRANSLATOR_SUPPORTED
-            ).run(default_choice)
+
+            # fixme 命令行选择模型，PyChram中执行时无法选择，这里手动输入
+            # translator = BulletMenu(
+            #     f"请为『{project_dir.split(os.sep)[-1]}』项目选择翻译器：", TRANSLATOR_SUPPORTED
+            # ).run(default_choice)
+            # print(f"translator-{translator}")
+            translator = "gpt35-0613"
+
         except KeyboardInterrupt:
             print("\nGoodbye.")
             sys.exit(0)

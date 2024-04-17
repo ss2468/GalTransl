@@ -6,3 +6,14 @@ __pycache__/
 useful_tools/GalTransl_DumpInjector/config.ini
 useful_tools/GalTransl_DumpInjector/VNTextPatch/names.xml
 *.log
+
+# 文件夹
+/.idea/
+
+# 项目
+/custom/
+/demo/
+
+# 文件
+*.whl
+*.rar
