@@ -25,7 +25,7 @@ from GalTransl.Backend.Prompts import (
     GPT4Turbo_TRANS_PROMPT,
     GPT4Turbo_CONF_PROMPT,
     GPT4Turbo_PROOFREAD_PROMPT,
-    H_WORDS_LIST
+    H_WORDS_LIST,
 )
 
 
@@ -233,7 +233,7 @@ class CGPT4Translate:
                 )
                 if self.streamOutputMode:
                     LOGGER.info("->输出：")
-                resp = ""
+                resp, data = "", ""
                 if self.eng_type != "unoffapi":
                     if not self.full_context_mode:
                         self._del_previous_message()
@@ -241,7 +241,6 @@ class CGPT4Translate:
                         if self.streamOutputMode:
                             print(data, end="", flush=True)
                         resp += data
-                    print(data, end="\n")
                 elif self.eng_type == "unoffapi":
                     async for data in self.chatbot.ask_async(prompt_req):
                         if self.streamOutputMode:
@@ -264,6 +263,9 @@ class CGPT4Translate:
                     LOGGER.error(f"-> 余额不足： {self.token.maskToken()}")
                     self.token = self.tokenProvider.getToken(False, True)
                     self.chatbot.set_api_key(self.token.token)
+                    self._del_last_answer()
+                    LOGGER.warning(f"-> 切换到token {self.token.maskToken()}")
+                    continue
                 elif "try again later" in str_ex or "too many requests" in str_ex:
                     LOGGER.warning("-> 请求受限，1分钟后继续尝试")
                     await asyncio.sleep(60)
@@ -272,18 +274,19 @@ class CGPT4Translate:
                     self.reset_conversation()
                     LOGGER.error("-> 报错重置会话")
                     continue
-
-                self._del_last_answer()
-                LOGGER.info("-> 报错:%s, 5秒后重试" % ex)
-                await asyncio.sleep(5)
-                continue
+                else:
+                    self._del_last_answer()
+                    LOGGER.info("-> 报错:%s, 2秒后重试" % ex)
+                    await asyncio.sleep(2)
+                    continue
 
             result_text = resp
             if "```json" in result_text:
                 lang_list, code_list = extract_code_blocks(result_text)
                 if len(lang_list) > 0 and len(code_list) > 0:
                     result_text = code_list[0]
-            result_text = result_text[result_text.find('{"id') :]
+            if '{"id' in result_text:
+                result_text = result_text[result_text.find('{"id') :]
 
             result_text = (
                 result_text.replace(", doub:", ', "doub":')
