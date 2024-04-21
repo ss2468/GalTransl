@@ -356,6 +356,7 @@ class CGptDict:
                 prev_dic = self._dic_list[i - 1] if i > 0 else None
                 if prev_dic and dic.search_word in prev_dic.search_word:
                     input_text = input_text.replace(prev_dic.search_word, "")
+                # fixme 判断输入文本中是否包含字典词条，英文需要分词处理
                 if dic.startswith_flag or dic.search_word in input_text:
                     promt += f"| {dic.search_word} | {dic.replace_word} |"
                     if dic.note != "":

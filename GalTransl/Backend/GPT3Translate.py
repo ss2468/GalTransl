@@ -199,6 +199,7 @@ class CGPT35Translate:
                 del tmp_obj["name"]
             input_list.append(tmp_obj)
         input_json = json.dumps(input_list, ensure_ascii=False)
+        # fixme 发给OpenAI的prompt
         prompt_req = self.trans_prompt
         prompt_req = prompt_req.replace("[Input]", input_json)
         prompt_req = prompt_req.replace("[Glossary]", gptdict)
