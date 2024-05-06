@@ -1,3 +1,4 @@
+import re
 from typing import List
 from os import path
 from GalTransl.CSentense import CSentense, CTransList
@@ -346,7 +347,7 @@ class CGptDict:
             f"载入 GPT字典: {path.basename(dic_path)} {normalDic_count}普通词条"
         )
 
-    def gen_prompt(self, trans_list: CTransList, type="gpt"):
+    def gen_prompt(self, trans_list: CTransList, type="gpt", source_lang="ja"):
         promt = ""
         input_text = "\n".join(
             [f"{tran.speaker}:{tran.post_jp}" for tran in trans_list]
@@ -356,12 +357,19 @@ class CGptDict:
                 prev_dic = self._dic_list[i - 1] if i > 0 else None
                 if prev_dic and dic.search_word in prev_dic.search_word:
                     input_text = input_text.replace(prev_dic.search_word, "")
-                # fixme 判断输入文本中是否包含字典词条，英文需要分词处理
-                if dic.startswith_flag or dic.search_word in input_text:
-                    promt += f"| {dic.search_word} | {dic.replace_word} |"
-                    if dic.note != "":
-                        promt += f" {dic.note}"
-                    promt += " |\n"
+                # fixme 判断输入文本中是否包含字典词条，日文搜索，英文分词
+                if source_lang == "Japanese":
+                    if dic.startswith_flag or dic.search_word in input_text:
+                        promt += f"| {dic.search_word} | {dic.replace_word} |"
+                        if dic.note != "":
+                            promt += f" {dic.note}"
+                        promt += " |\n"
+                elif source_lang == "English":
+                    if dic.startswith_flag or dic.search_word in re.findall(r"\b\w+\b", input_text.lower()):
+                        promt += f"| {dic.search_word} | {dic.replace_word} |"
+                        if dic.note != "":
+                            promt += f" {dic.note}"
+                        promt += " |\n"
 
             if promt != "":
                 promt = (

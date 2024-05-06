@@ -515,7 +515,7 @@ class CGPT35Translate:
 
             dic_prompt = ""
             if gpt_dic != None:
-                dic_prompt = gpt_dic.gen_prompt(trans_list_split)
+                dic_prompt = gpt_dic.gen_prompt(trans_list=trans_list_split, source_lang=self.source_lang)
             # fixme 翻译真正的执行位置
             num, trans_result = await self.asyncTranslate(trans_list_split, dic_prompt)
             trans_result_list += trans_result
