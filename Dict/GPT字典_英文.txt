@@ -1,5 +1,4 @@
 ass	屁股	noun
-asshole	菊花	noun
 bitch	婊子	noun
 boobs	奶子	noun
 breasts	奶子	noun
@@ -8,7 +7,7 @@ cock	肉棒	noun
 cum	射精	noun
 cunt	小穴	noun
 daddy	爸爸	noun
-fuck	肏	noun
+fuck	操	noun
 fuckpet	肉便器	noun
 fucktoy	肉便器	noun
 fucktoys	肉便器	noun
@@ -16,6 +15,7 @@ hole	穴	noun
 holes	穴	noun
 kitten	小猫咪	noun
 lewd	淫荡	noun
+lust	欲望	noun
 master	主人	noun
 masturbate	自慰	noun
 mommy	妈咪	noun
@@ -28,3 +28,5 @@ slave	奴隶	noun
 slut	荡妇	noun
 toy	玩具	noun
 whore	婊子	noun
+blowjob	口交	noun
+dick	鸡巴	noun

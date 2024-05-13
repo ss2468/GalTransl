@@ -9,6 +9,7 @@ useful_tools/GalTransl_DumpInjector/VNTextPatch/names.xml
 
 # 文件夹
 /.idea/
+/useful_tools/
 
 # 项目
 /custom/

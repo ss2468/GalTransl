@@ -261,6 +261,7 @@ class Chatbot:
             self.reset(convo_id=convo_id, system_prompt=self.system_prompt)
         self.add_to_conversation(prompt, "user", convo_id=convo_id)
         self.__truncate_conversation(convo_id=convo_id)
+        # fixme 发送给OpenAI的请求
         # Get response
         async with self.aclient.stream(
             "post",
