@@ -41,6 +41,11 @@ class CGPT35Translate:
         self.eng_type = eng_type
         self.last_file_name = ""
         self.retry_count = 0
+        # 保存间隔
+        if val := config.getKey("save_steps"):
+            self.save_steps = val
+        else:
+            self.save_steps = 1
         # 语言设置
         if val := config.getKey("language"):
             sp = val.split("2")
@@ -99,7 +104,7 @@ class CGPT35Translate:
             self.proxyProvider = proxy_pool
         else:
             self.proxyProvider = None
-            LOGGER.warning("不使用代理")
+            
 
         # 翻译风格
         if val := config.getKey("gpt.translStyle"):
@@ -224,20 +229,20 @@ class CGPT35Translate:
                 LOGGER.error(f"-> {str_ex}")
                 if "quota" in str_ex:
                     self.tokenProvider.reportTokenProblem(self.token)
-                    LOGGER.error(f"-> 余额不足： {self.token.maskToken()}")
+                    LOGGER.error(f"-> [请求错误]余额不足： {self.token.maskToken()}")
                     self.token = self.tokenProvider.getToken(True, False)
                     self.chatbot.set_api_key(self.token.token)
                 elif "try again later" in str_ex or "too many requests" in str_ex:
-                    LOGGER.warning("-> 请求受限，1分钟后继续尝试")
+                    LOGGER.warning("-> [请求错误]请求受限，1分钟后继续尝试")
                     await asyncio.sleep(60)
                     continue
                 elif "try reload" in str_ex:
                     self.reset_conversation()
-                    LOGGER.error("-> 报错重置会话")
+                    LOGGER.error("-> [请求错误]报错重置会话")
                     continue
 
                 self._del_last_answer()
-                LOGGER.error(f"-> 报错, 5秒后重试")
+                LOGGER.error(f"-> [请求错误]报错, 5秒后重试")
                 await asyncio.sleep(5)
                 continue
 
@@ -259,11 +264,11 @@ class CGPT35Translate:
             try:
                 result_json = json.loads(result_text)  # 尝试解析json
                 if len(result_json) != len(input_list):  # 输出行数错误
-                    LOGGER.error("-> 错误的输出行数：\n" + result_text + "\n")
+                    LOGGER.error("-> [解析错误]错误的输出行数：\n" + result_text + "\n")
                     error_message = "输出行数错误"
                     error_flag = True
             except:
-                LOGGER.error("-> 非json：\n" + result_text + "\n")
+                LOGGER.error("-> [解析错误]非json：\n" + result_text + "\n")
                 error_message = "输出非json"
                 error_flag = True
 
@@ -302,11 +307,11 @@ class CGPT35Translate:
             #         error_flag = True
 
             if error_flag:
-                LOGGER.error(f"-> 解析结果出错：{error_message}")
+                LOGGER.error(f"-> [解析错误]解析结果出错：{error_message}")
                 # 跳过重试
                 if self.skipRetry:
                     self.reset_conversation()
-                    LOGGER.warning("-> 解析出错但直接跳过本轮翻译")
+                    LOGGER.warning("-> [解析错误]解析出错但直接跳过本轮翻译")
                     i = 0
                     while i < len(content):
                         content[i].pre_zh = "Failed translation"
@@ -336,16 +341,16 @@ class CGPT35Translate:
                 # 单句重试仍错则重置会话
                 if self.retry_count == 3:
                     self.reset_conversation()
-                    LOGGER.warning("-> 单句仍错，重置会话")
+                    LOGGER.warning("-> [解析错误]单句仍错，重置会话")
                 # 单句5次重试则中止
                 if self.retry_count == 5:
                     raise RuntimeError(
-                        f"-> 单句反复出错，已中止。最后错误为：{error_message}"
+                        f"-> [解析错误]单句反复出错，已中止。最后错误为：{error_message}"
                     )
                 continue
 
             if warn_flag:
-                LOGGER.warning(f"-> 解析结果有问题：{error_message}")
+                LOGGER.warning(f"-> [解析错误]解析结果有问题：{error_message}")
                 await asyncio.sleep(1)
 
             for i, result in enumerate(result_json):  # 正常输出
@@ -405,12 +410,6 @@ class CGPT35Translate:
         if self._current_style == style_name:
             return
         self._current_style = style_name
-
-        LOGGER.info(
-            f"-> 自动切换至{style_name}参数预设"
-            if self.transl_style == "auto"
-            else f"-> 使用{style_name}参数预设"
-        )
 
         if style_name == "precise":
             temperature, top_p = 1.0, 0.4
@@ -509,6 +508,7 @@ class CGPT35Translate:
         i = 0
         trans_result_list = []
         len_trans_list = len(trans_list_unhit)
+        transl_step_count = 0
         while i < len_trans_list:
             await asyncio.sleep(1)
             trans_list_split = trans_list_unhit[i : i + num_pre_req]
@@ -521,7 +521,10 @@ class CGPT35Translate:
             trans_result_list += trans_result
             i += num if num > 0 else 0
 
-            save_transCache_to_json(trans_list, cache_path)
+            transl_step_count+=1
+            if transl_step_count>=self.save_steps:
+                save_transCache_to_json(trans_list, cache_path)
+                transl_step_count=0
             LOGGER.info("".join([repr(tran) for tran in trans_result]))
             LOGGER.info(f"{filename}: {len(trans_result_list)}/{len_trans_list}")
 
