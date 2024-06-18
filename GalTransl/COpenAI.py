@@ -113,6 +113,7 @@ class COpenAITokenPool:
                 model_name = TRANSLATOR_ENGINE.get(eng_type, "gpt-3.5-turbo")
                 if self.force_eng_name:
                     model_name = self.force_eng_name
+                # fixme 验证token是否可用
                 # test if have balance
                 chatResponse = await client.post(
                     token.domain + "/v1/chat/completions",
@@ -139,7 +140,8 @@ class COpenAITokenPool:
                         isGPT4Available, isGPT3Available = True, True
 
                     return True, isGPT3Available, isGPT4Available, token
-        except:
+        except Exception as e:
+            print(e)
             LOGGER.debug(
                 "we got exception in testing OpenAI token %s", token.maskToken()
             )

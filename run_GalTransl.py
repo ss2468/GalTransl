@@ -12,6 +12,7 @@ from GalTransl import (
 from GalTransl.__main__ import worker
 
 
+# fixme 命令行输入配置文件
 INPUT_PROMPT_TMP = "请输入/拖入项目文件夹，或项目文件夹内的yaml配置文件[default]："
 
 
@@ -65,12 +66,14 @@ def main():
                 default_choice = 0
             os.system("")  # 解决cmd的ANSI转义bug
 
-            # fixme 命令行选择模型，PyChram中执行时无法选择，这里手动输入
+            # # fixme 命令行选择模型，PyChram中执行时无法选择，这里手动输入
             # translator = BulletMenu(
             #     f"请为『{project_dir.split(os.sep)[-1]}』项目选择翻译器：", TRANSLATOR_SUPPORTED
             # ).run(default_choice)
             # print(f"translator-{translator}")
-            translator = "gpt35-0613"
+            # translator = "gpt35-1106"
+            # translator = "sakura-010"
+            translator = "galtransl-v1"
 
         except KeyboardInterrupt:
             print("\nGoodbye.")
