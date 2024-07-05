@@ -5,6 +5,11 @@ from GalTransl.CSentense import CSentense, CTransList
 from GalTransl import LOGGER
 from GalTransl.Utils import process_escape
 
+from sudachipy import dictionary
+from sudachipy import tokenizer
+
+tokenizer_obj = dictionary.Dictionary(dict="full").create()
+mode = tokenizer.Tokenizer.SplitMode.B
 
 class ifWord:
     __slots__ = ["without_flag", "startswith_flag", "endswith_flag", "word"]
@@ -364,6 +369,8 @@ class CGptDict:
         input_text = "\n".join(
             [f"{tran.speaker}:{tran.post_jp}" for tran in trans_list]
         )
+        # fixme sudachipy分词
+        surfaces = [m.surface() for m in tokenizer_obj.tokenize(input_text, mode)]
         if type == "gpt":
             for i, dic in enumerate(self._dic_list):
                 prev_dic = self._dic_list[i - 1] if i > 0 else None
@@ -371,7 +378,8 @@ class CGptDict:
                     input_text = input_text.replace(prev_dic.search_word, "")
                 # fixme 判断输入文本中是否包含字典词条，日文搜索，英文分词
                 if source_lang == "Japanese":
-                    if dic.startswith_flag or dic.search_word in input_text:
+                    # if dic.startswith_flag or dic.search_word in input_text:
+                    if dic.startswith_flag or dic.search_word in surfaces:
                         promt += f"| {dic.search_word} | {dic.replace_word} |"
                         if dic.note != "":
                             promt += f" {dic.note}"
@@ -393,7 +401,7 @@ class CGptDict:
                 prev_dic = self._dic_list[i - 1] if i > 0 else None
                 if prev_dic and dic.search_word in prev_dic.search_word:
                     input_text = input_text.replace(prev_dic.search_word, "")
-                if dic.startswith_flag or dic.search_word in input_text:
+                if dic.startswith_flag or dic.search_word in surfaces:
                     promt += f"{dic.search_word}->{dic.replace_word}"
                     if dic.note != "":
                         promt += f" #{dic.note}"
@@ -403,8 +411,11 @@ class CGptDict:
 
     def check_dic_use(self, find_from_str: str, tran: CSentense):
         problem_list = []
+        # fixme 检测字典使用
+        surfaces = [m.surface() for m in tokenizer_obj.tokenize(tran.post_jp, mode)]
         for dic in self._dic_list:
-            if dic.search_word not in tran.post_jp:
+            # if dic.search_word not in tran.post_jp:
+            if dic.search_word not in surfaces:
                 continue
 
             replace_word_list = (

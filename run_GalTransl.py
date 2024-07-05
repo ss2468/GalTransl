@@ -75,10 +75,12 @@ class ProjectManager:
         # print(f"translator-{self.translator}")
         # self.translator = "gpt35-1106"
         self.translator = "galtransl-v1"
+        # self.translator = "rebuilda"  # 刷新缓存
 
     def project_name(self):
         return self.project_dir.split(os.sep)[-1] if self.project_dir else ""
 
+    # fixme 创建bat快捷启动
     def create_shortcut_win(self):
         TEMPLATE = 'chcp 65001\ncd /d "{0}"\n{1} "{2}" {3}\npause'
         run_com = "python.exe " + os.path.basename(__file__)
@@ -87,12 +89,12 @@ class ProjectManager:
         conf_path = os.path.join(self.project_dir, self.config_file_name)
         if "nt" not in os.name:  # not windows
             return
-        if getattr(sys, "frozen", False):  # PyInstaller
-            run_com = os.path.basename(sys.executable)
-            program_dir = os.path.dirname(sys.executable)
-        with open(shortcut_path, "w", encoding="utf-8") as f:
-            text = TEMPLATE.format(program_dir, run_com, conf_path, self.translator)
-            f.write(text)
+        # if getattr(sys, "frozen", False):  # PyInstaller
+        #     run_com = os.path.basename(sys.executable)
+        #     program_dir = os.path.dirname(sys.executable)
+        # with open(shortcut_path, "w", encoding="utf-8") as f:
+        #     text = TEMPLATE.format(program_dir, run_com, conf_path, self.translator)
+        #     f.write(text)
 
     def run(self):
         # 检查命令行参数
