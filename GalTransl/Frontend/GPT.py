@@ -60,8 +60,9 @@ async def doLLMTranslateSingleFile(
             output_file_dir = dirname(output_file_path)
             makedirs(output_file_dir, exist_ok=True)
             cache_file_path = joinpath(cache_dir, file_name)
+            print("\n", flush=True)
             LOGGER.info(
-                f"engine type: {eng_type}, file: {file_name}, start translating.."
+                f"start translating: {file_name}, engine type: {eng_type}"
             )
 
             match eng_type:
@@ -213,7 +214,7 @@ async def doLLMTranslateSingleFile(
     save_func(output_file_path, new_json_list)
 
     et = time()
-    LOGGER.info(f"文件 {file_name} 翻译完成，用时 {et-st:.3f}s.")
+    LOGGER.info(f"  end translating: {file_name} 翻译完成，用时 {et-st:.3f}s.")
     return True
 
 
@@ -240,6 +241,10 @@ async def doLLMTranslate(
     pre_dic = CNormalDic(initDictList(pre_dic_dir, default_dic_dir, project_dir))
     post_dic = CNormalDic(initDictList(post_dic_dir, default_dic_dir, project_dir))
     gpt_dic = CGptDict(initDictList(gpt_dic_dir, default_dic_dir, project_dir))
+
+    if projectConfig.getDictCfgSection().get("sortPrePostDict", False):
+        pre_dic.sort_dic()
+        post_dic.sort_dic()
 
     workersPerProject = projectConfig.getKey("workersPerProject")
 
@@ -270,7 +275,7 @@ async def doLLMTranslate(
     if not file_list:
         raise RuntimeError(f"{projectConfig.getInputPath()}中没有待翻译的文件")
     semaphore = Semaphore(workersPerProject)
-    progress_bar = atqdm(total=len(file_list), desc="Processing files")
+    progress_bar = atqdm(total=len(file_list), desc="Processing files", dynamic_ncols=True, leave=False)
     tasks = [
         run_task(
             doLLMTranslateSingleFile(
