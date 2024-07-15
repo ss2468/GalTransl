@@ -17,5 +17,6 @@ beautifulsoup4
 # 额外依赖
 jieba==0.42.1
 lemminflect==0.2.3
+playwright==1.43.0
 sudachipy==0.6.8
 sudachidict-full==20240409

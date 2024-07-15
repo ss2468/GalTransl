@@ -1,6 +1,5 @@
 import os
 import sys
-from command import BulletMenu
 from GalTransl import (
     AUTHOR,
     CONFIG_FILENAME,
@@ -11,7 +10,6 @@ from GalTransl import (
 )
 from GalTransl.__main__ import worker
 
-# fixme 命令行输入配置文件
 INPUT_PROMPT_TMP = "请输入/拖入项目文件夹，或项目文件夹内的yaml配置文件[default]："
 
 
@@ -71,12 +69,6 @@ class ProjectManager:
         )
         os.system("")  # 解决cmd的ANSI转义bug
 
-        # # fixme 命令行选择模型，PyChram中执行时无法选择，这里手动输入
-        # print(f"translator-{self.translator}")
-        # self.translator = "gpt35-1106"
-        self.translator = "galtransl-v1"
-        # self.translator = "rebuilda"  # 刷新缓存
-
     def project_name(self):
         return self.project_dir.split(os.sep)[-1] if self.project_dir else ""
 
@@ -105,6 +97,15 @@ class ProjectManager:
             )
             if len(sys.argv) > 2 and sys.argv[2] in TRANSLATOR_SUPPORTED.keys():
                 self.translator = sys.argv[2]
+
+        # fixme 手动输入配置和模型
+        self.user_input = "C:/Users/Administrator/UntitledProjects/Galgame/GalTransl/demo/config.yaml"
+        self.user_input, self.project_dir, self.config_file_name = (
+            self.validate_project_path(self.user_input)
+        )
+        # self.translator = "gpt35-1106"
+        self.translator = "galtransl-v1"
+        # self.translator = "rebuilda"  # 刷新缓存
 
         while True:
             self.print_program_info()

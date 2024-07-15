@@ -144,6 +144,7 @@ class CSakuraTranslate:
                 repetition_cnt = 0
                 degen_flag = False
                 self._del_previous_message()
+                # fixme 翻译执行位置
                 ask_stream = self.chatbot.ask_stream_async(prompt_req)
                 async for data in ask_stream:
                     if self.streamOutputMode:
