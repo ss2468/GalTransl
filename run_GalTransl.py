@@ -103,8 +103,8 @@ class ProjectManager:
         self.user_input, self.project_dir, self.config_file_name = (
             self.validate_project_path(self.user_input)
         )
-        # self.translator = "gpt35-1106"
-        self.translator = "galtransl-v1"
+        self.translator = "gpt35-1106"
+        # self.translator = "galtransl-v1"
         # self.translator = "rebuilda"  # 刷新缓存
 
         while True:

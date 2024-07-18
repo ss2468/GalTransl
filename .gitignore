@@ -16,5 +16,5 @@ useful_tools/GalTransl_DumpInjector/VNTextPatch/names.xml
 /demo/
 
 # 文件
-*.whl
+*.pyc
 *.rar
