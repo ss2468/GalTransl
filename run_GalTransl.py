@@ -104,7 +104,7 @@ class ProjectManager:
             self.validate_project_path(self.user_input)
         )
         self.translator = "gpt35-1106"
-        # self.translator = "galtransl-v1"
+        # self.translator = "galtransl-v1.5"
         # self.translator = "rebuilda"  # 刷新缓存
 
         while True:
