@@ -50,7 +50,7 @@ PROGRAM_SPLASH4 = r"""
 ALL_BANNERS = [PROGRAM_SPLASH1, PROGRAM_SPLASH2, PROGRAM_SPLASH3, PROGRAM_SPLASH4]
 PROGRAM_SPLASH = ALL_BANNERS[localtime().tm_mday % 4]
 
-GALTRANSL_VERSION = "5.5.0"
+GALTRANSL_VERSION = "5.6.2"
 AUTHOR = "xd2333"
 CONTRIBUTORS = (
     "ryank231231, PiDanShouRouZhouXD, Noriverwater, Isotr0py, adsf0427, pipixia244, gulaodeng"
@@ -63,7 +63,7 @@ CACHE_FOLDERNAME = "transl_cache"
 TRANSLATOR_SUPPORTED = {
     "gpt4-turbo": "（兼容Claude-3 haiku-opus中转）GPT-4官方或中转API，默认1106模型。逻辑优秀，犯错少，",
     "sakura-010": "为翻译轻小说/视觉小说开展大规模训练的本地模型，具有多个型号和大小。适用v0.10版prompt",
-    "galtransl-v1.5": "为视觉小说翻译任务进一步优化的本地模型，有着平衡的硬件需求、翻译质量与稳定性",
+    "galtransl-v2": "为视觉小说翻译任务进一步优化的本地模型，有着平衡的硬件需求、翻译质量与稳定性",
     "gpt35-1106": "GPT-3.5官方或中转API，默认1106模型。入门模型",
     "newbing": "模拟网页模式。文风优秀，只能翻译日常文本，速度慢",
     "sakura-009": "为翻译轻小说/视觉小说开展大规模训练的本地模型。适用v0.9版prompt，不支持GPT字典",

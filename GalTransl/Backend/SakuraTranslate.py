@@ -92,7 +92,7 @@ class CSakuraTranslate:
         if eng_type == "sakura-010":
             self.system_prompt = Sakura_SYSTEM_PROMPT010
             self.trans_prompt = Sakura_TRANS_PROMPT010
-        if eng_type == "galtransl-v1.5":
+        if "galtransl" in eng_type:
             self.system_prompt = GalTransl_SYSTEM_PROMPT
             self.trans_prompt = GalTransl_TRANS_PROMPT
         self.chatbot = ChatbotV3(
@@ -105,9 +105,8 @@ class CSakuraTranslate:
         self.chatbot.update_proxy(
             self.proxyProvider.getProxy().addr if self.proxyProvider else None  # type: ignore
         )
-        self.transl_style = "auto"
-        self._current_style = "precies"
-        self._set_gpt_style("precise")
+        self._current_temp_type = "precies"
+        self._set_temp_type("precise")
 
     async def translate(self, trans_list: CTransList, gptdict=""):
         input_list = []
@@ -251,9 +250,7 @@ class CSakuraTranslate:
                     self._del_last_answer()
                     await asyncio.sleep(1)
                     if degen_flag:
-                        # 切换模式
-                        if self.transl_style == "auto":
-                            self._set_gpt_style("normal")
+                        self._set_temp_type("normal")
                         # 先增加frequency_penalty参数重试再进行二分
                         if not once_flag:
                             once_flag = True
@@ -289,8 +286,8 @@ class CSakuraTranslate:
                     continue
             else:
                 self.retry_count = 0
-            if self.transl_style == "auto":
-                self._set_gpt_style("precise")
+
+            self._set_temp_type("precise")
             return i + 1, result_trans_list
 
     async def batch_translate(
@@ -404,17 +401,25 @@ class CSakuraTranslate:
         if self.chatbot.conversation["default"][-1]["role"] == "user":
             self.chatbot.conversation["default"].pop()
 
-    def _set_gpt_style(self, style_name: str):
-        if self._current_style == style_name:
+    def _set_temp_type(self, style_name: str):
+        if self._current_temp_type == style_name:
             return
-        self._current_style = style_name
-
+        self._current_temp_type = style_name
+        
         if style_name == "precise":
             temperature, top_p = 0.1618, 0.8
             frequency_penalty, presence_penalty = 0.1, 0.0
         elif style_name == "normal":
             temperature, top_p = 0.4, 0.95
             frequency_penalty, presence_penalty = 0.3, 0.0
+        
+        if "galtransl" in self.eng_type:
+            if style_name == "precise":
+                temperature, top_p = 0.3, 0.8
+                frequency_penalty, presence_penalty = 0.1, 0.0
+            elif style_name == "normal":
+                temperature, top_p = 0.6, 0.95
+                frequency_penalty, presence_penalty = 0.3, 0.0
 
         self.chatbot.temperature = temperature
         self.chatbot.top_p = top_p
