@@ -1,6 +1,5 @@
 import os
 import sys
-from command import BulletMenu
 from GalTransl import (
     AUTHOR,
     CONFIG_FILENAME,
@@ -11,7 +10,6 @@ from GalTransl import (
 )
 from GalTransl.__main__ import worker
 
-# fixme 命令行输入配置文件
 INPUT_PROMPT_TMP = "请输入/拖入项目文件夹，或项目文件夹内的yaml配置文件[default]："
 
 
@@ -76,11 +74,11 @@ class ProjectManager:
 
     # fixme 创建bat快捷启动
     def create_shortcut_win(self):
-        TEMPLATE = 'chcp 65001\ncd /d "{0}"\n{1} "{2}" {3}\npause'
+        TEMPLATE = '@echo off\nchcp 65001\nset "CURRENT_PATH=%CD%"\ncd /d "{0}"\n{1} "{2}" {3}\npause\ncd /d "%CURRENT_PATH%"'
         run_com = "python.exe " + os.path.basename(__file__)
         program_dir = os.path.dirname(os.path.abspath(__file__))
         shortcut_path = f"{self.project_dir}{os.sep}run_GalTransl_v{GALTRANSL_VERSION}_{self.translator}.bat"
-        conf_path = os.path.join(self.project_dir, self.config_file_name)
+        conf_path = "%CURRENT_PATH%\\" + self.config_file_name
         if "nt" not in os.name:  # not windows
             return
         # if getattr(sys, "frozen", False):  # PyInstaller
@@ -105,8 +103,8 @@ class ProjectManager:
         self.user_input, self.project_dir, self.config_file_name = (
             self.validate_project_path(self.user_input)
         )
-        self.translator = "gpt35-1106"
-        # self.translator = "galtransl-v1"
+        # self.translator = "gpt35-1106"
+        self.translator = "galtransl-v2"
         # self.translator = "rebuilda"  # 刷新缓存
 
         while True:
